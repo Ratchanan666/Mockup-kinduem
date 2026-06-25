@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINDUEM Asset Management System - ระบบบริหารจัดการทรัพย์สินไอที</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ==========================================
+         1. LOGIN PAGE VIEW
+         ========================================== -->
+    <div id="login-view" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="login-logo-icon">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <div class="login-title">KINDUEM ASSET</div>
+                <div class="login-subtitle">ระบบบริหารจัดการทรัพย์สินและอุปกรณ์ IT ขององค์กร</div>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">ชื่อผู้ใช้งาน (Username)</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="username" class="form-control" placeholder="ระบุบัญชีผู้ใช้ระบบ..." required value="admin">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน (Password)</label>
+                    <div class="input-with-icon">
+                        <input type="password" id="password" class="form-control" placeholder="ระบุรหัสผ่าน..." required value="password">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <span>เข้าสู่ระบบ</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </form>
+            
+            <div class="demo-credentials">
+                <strong>💡 ข้อมูลการเข้าระบบสำหรับทดลองใช้งาน:</strong><br>
+                บัญชีผู้ใช้: <code>admin</code> | รหัสผ่าน: <code>password</code><br>
+                หรือกดปุ่ม <strong>"เข้าสู่ระบบ"</strong> ได้ทันที
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         2. MAIN APP VIEW
+         ========================================== -->
+    <div id="app-view" class="app-wrapper">
+        
+        <!-- SIDEBAR MENU -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span class="sidebar-logo-text">KINDUEM</span>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" data-tab="dashboard">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>แดชบอร์ด</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="assets">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-laptop"></i>
+                        <span>ทรัพย์สิน & อุปกรณ์</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="borrow">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-handshake"></i>
+                        <span>ยืมอุปกรณ์</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="transfer">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-right-left"></i>
+                        <span>โอนย้ายอุปกรณ์</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="shipping">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-truck"></i>
+                        <span>การจัดส่งอุปกรณ์</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="reports">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-file-contract"></i>
+                        <span>รายงานระบบ</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-tab="settings">
+                    <a class="sidebar-link">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>ตั้งค่าระบบ</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">AD</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Administrators</div>
+                    <div class="sidebar-user-role">ผู้ดูแลระบบทั่วไป</div>
+                </div>
+                <button id="logout-trigger" class="logout-btn" title="ออกจากระบบ">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN WINDOW -->
+        <div class="main-container">
+            
+            <!-- TOP NAVBAR -->
+            <header class="navbar">
+                <div class="navbar-left">
+                    <button id="menu-toggle-btn" class="menu-toggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 id="page-title" class="navbar-title">แดชบอร์ดระบบ</h2>
+                </div>
+                
+                <div class="navbar-right">
+                    <!-- Global Search inside dashboard -->
+                    <div class="search-bar-nav">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="global-search" placeholder="ค้นหาทรัพย์สินด่วน...">
+                    </div>
+                    
+                    <!-- Notification Bell -->
+                    <button id="notify-bell" class="nav-action-btn">
+                        <i class="fa-regular fa-bell"></i>
+                        <span id="notify-badge" class="nav-badge">3</span>
+                    </button>
+                    
+                    <!-- Floating Notification Panel -->
+                    <div id="notify-panel" class="notification-panel">
+                        <div class="notification-header">
+                            <h4>การแจ้งเตือนของระบบ</h4>
+                            <button id="clear-notify" class="clear-notifications">อ่านทั้งหมด</button>
+                        </div>
+                        <div id="notify-list" class="notification-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- User Profile avatar -->
+                    <div class="sidebar-user-avatar" style="border-color: var(--border-color);">AD</div>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT BODY -->
+            <main class="content-body">
+
+                <!-- -----------------------------------------
+                     TAB A: DASHBOARD VIEW
+                     ----------------------------------------- -->
+                <div id="dashboard-tab" class="tab-pane active">
+                    
+                    <!-- Stats Cards Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card total" onclick="switchTab('assets')">
+                            <div class="stat-info">
+                                <div class="stat-label">ทรัพย์สินทั้งหมด</div>
+                                <div id="stat-total-assets" class="stat-value">6</div>
+                                <div class="stat-trend up">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                    <span>เพิ่มขึ้น 12% เดือนนี้</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card borrowed" onclick="switchTab('assets', 'Borrowed')">
+                            <div class="stat-info">
+                                <div class="stat-label">อุปกรณ์ถูกยืม</div>
+                                <div id="stat-borrowed-assets" class="stat-value">2</div>
+                                <div class="stat-trend info" style="color: var(--status-borrowed);">
+                                    <i class="fa-solid fa-hand-holding-hand"></i>
+                                    <span>กำลังใช้งานอยู่</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-handshake"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card overdue" onclick="switchTab('assets', 'Overdue')">
+                            <div class="stat-info">
+                                <div class="stat-label">คืนเกินกำหนด</div>
+                                <div id="stat-overdue-assets" class="stat-value">1</div>
+                                <div class="stat-trend down">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                    <span>ต้องติดตามเร่งด่วน</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card requests">
+                            <div class="stat-info">
+                                <div class="stat-label">คำขอโอนย้าย</div>
+                                <div id="stat-transfer-requests" class="stat-value">1</div>
+                                <div class="stat-trend warning" style="color: var(--status-pending);">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    <span>รอผู้ดูแลอนุมัติ</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-right-left"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card value">
+                            <div class="stat-info">
+                                <div class="stat-label">มูลค่าทรัพย์สินไอที</div>
+                                <div id="stat-asset-value" class="stat-value">325,500 ฿</div>
+                                <div class="stat-trend up">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    <span>ทรัพย์สินได้รับการคุ้มครอง</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Grid -->
+                    <div class="analytics-grid">
+                        <!-- Chart Widget -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-chart-column"></i>
+                                    <span>จำนวนอุปกรณ์แยกตามหมวดหมู่ (IT Asset Categories Chart)</span>
+                                </h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="assetTypeChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity List -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>ประวัติการทำงานล่าสุด (Recent Activities)</span>
+                                </h3>
+                            </div>
+                            <ul id="activity-feed" class="activity-list">
+                                <!-- Populated dynamically by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB B: ASSETS MANAGEMENT VIEW
+                     ----------------------------------------- -->
+                <div id="assets-tab" class="tab-pane">
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fa-solid fa-laptop-code"></i>
+                                <span>รายการทรัพย์สินและอุปกรณ์ทั้งหมดในองค์กร</span>
+                            </h3>
+                            <button id="add-asset-btn" class="btn-primary">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>เพิ่มอุปกรณ์ใหม่</span>
+                            </button>
+                        </div>
+
+                        <!-- Table Filters & Search -->
+                        <div class="table-controls">
+                            <div class="controls-left">
+                                <div class="search-box">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="asset-search" placeholder="ค้นหาด้วยรหัสทรัพย์สิน หรือ ชื่ออุปกรณ์...">
+                                </div>
+                                <select id="filter-category" class="filter-select">
+                                    <option value="All">ทุกหมวดหมู่ (All Categories)</option>
+                                    <option value="Desktop Computer">Desktop Computer</option>
+                                    <option value="Notebook">Notebook</option>
+                                    <option value="Printer">Printer</option>
+                                    <option value="Monitor">Monitor</option>
+                                    <option value="Router">Router</option>
+                                    <option value="Switch">Switch</option>
+                                </select>
+                                <select id="filter-status" class="filter-select">
+                                    <option value="All">ทุกสถานะ (All Status)</option>
+                                    <option value="Active">ว่าง / พร้อมใช้งาน (Active)</option>
+                                    <option value="Borrowed">ถูกยืมใช้งาน (Borrowed)</option>
+                                    <option value="Overdue">เกินกำหนดคืน (Overdue)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Asset Inventory Table -->
+                        <div class="table-responsive">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>รหัสทรัพย์สิน (Asset ID)</th>
+                                        <th>ชื่ออุปกรณ์ (Asset Name)</th>
+                                        <th>หมวดหมู่ (Category)</th>
+                                        <th>สถานที่จัดเก็บ (Location)</th>
+                                        <th>สถานะ (Status)</th>
+                                        <th style="text-align: center;">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="asset-list-body">
+                                    <!-- Rendered dynamically by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB C: BORROW EQUIPMENT VIEW
+                     ----------------------------------------- -->
+                <div id="borrow-tab" class="tab-pane">
+                    <div class="card-panel form-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fa-solid fa-handshake"></i>
+                                <span>แบบฟอร์มบันทึกการยืมอุปกรณ์ไอที (Borrow Request Form)</span>
+                            </h3>
+                        </div>
+                        
+                        <form id="borrow-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="borrower-name">ชื่อผู้ยืมทรัพย์สิน</label>
+                                    <input type="text" id="borrower-name" class="form-control" style="padding-left: 14px;" placeholder="ระบุชื่อ-นามสกุล..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="borrower-dept">หน่วยงาน / แผนก</label>
+                                    <select id="borrower-dept" class="form-control" style="padding-left: 14px;" required>
+                                        <option value="">เลือกหน่วยงาน...</option>
+                                        <option value="Engineering">Engineering (วิศวกรรม/ไอที)</option>
+                                        <option value="Marketing">Marketing (การตลาด)</option>
+                                        <option value="Finance">Finance (การเงินและบัญชี)</option>
+                                        <option value="HR">HR (ทรัพยากรบุคคล)</option>
+                                        <option value="Operations">Operations (ฝ่ายปฏิบัติการ)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="borrow-asset-select">เลือกอุปกรณ์ที่ต้องการยืม (เฉพาะสถานะว่าง)</label>
+                                    <select id="borrow-asset-select" class="form-control" style="padding-left: 14px;" required>
+                                        <!-- Populated dynamically with 'Active' status assets by JS -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="borrow-date">วันที่ยืมอุปกรณ์</label>
+                                    <input type="date" id="borrow-date" class="form-control" style="padding-left: 14px;" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="return-date">วันที่กำหนดคืนอุปกรณ์</label>
+                                    <input type="date" id="return-date" class="form-control" style="padding-left: 14px;" required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="borrow-purpose">วัตถุประสงค์ในการยืมอุปกรณ์</label>
+                                    <textarea id="borrow-purpose" class="form-control" style="padding-left: 14px; height: 100px;" placeholder="ระบุเหตุผลความจำเป็นในการยืมใช้งานอุปกรณ์..." required></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">ล้างข้อมูล</button>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>ยืนยันคำขอยืม (Submit Request)</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB D: TRANSFER EQUIPMENT VIEW
+                     ----------------------------------------- -->
+                <div id="transfer-tab" class="tab-pane">
+                    <div class="card-panel form-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fa-solid fa-right-left"></i>
+                                <span>แบบฟอร์มโอนย้ายสถานที่และแผนกที่จัดเก็บอุปกรณ์ (Asset Transfer Form)</span>
+                            </h3>
+                        </div>
+                        
+                        <form id="transfer-form">
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="transfer-asset-select">เลือกอุปกรณ์ที่ต้องการโอนย้าย</label>
+                                    <select id="transfer-asset-select" class="form-control" style="padding-left: 14px;" required>
+                                        <!-- Populated dynamically with all assets by JS -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="transfer-source">สถานที่จัดเก็บปัจจุบัน (ต้นทาง)</label>
+                                    <input type="text" id="transfer-source" class="form-control" style="padding-left: 14px;" readonly placeholder="แสดงข้อมูลอัตโนมัติเมื่อเลือกอุปกรณ์">
+                                </div>
+                                <div class="form-group">
+                                    <label for="transfer-dest">สถานที่ปลายทางใหม่</label>
+                                    <select id="transfer-dest" class="form-control" style="padding-left: 14px;" required>
+                                        <option value="">เลือกสถานที่ปลายทาง...</option>
+                                        <option value="HQ-Floor 1">สำนักงานใหญ่ ชั้น 1 (HQ-Floor 1)</option>
+                                        <option value="HQ-Floor 2">สำนักงานใหญ่ ชั้น 2 (HQ-Floor 2)</option>
+                                        <option value="HQ-Floor 3">สำนักงานใหญ่ ชั้น 3 (HQ-Floor 3)</option>
+                                        <option value="Finance Room">ห้องฝ่ายการเงิน (Finance Room)</option>
+                                        <option value="Server Room A">ห้องเซิร์ฟเวอร์ A (Server Room A)</option>
+                                        <option value="Server Room B">ห้องเซิร์ฟเวอร์ B (Server Room B)</option>
+                                        <option value="Warehouse Branch A">คลังสินค้า สาขา A (Warehouse Branch A)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="transfer-date">วันที่โอนย้ายทรัพย์สิน</label>
+                                    <input type="date" id="transfer-date" class="form-control" style="padding-left: 14px;" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="transfer-status">สถานะกระบวนการ</label>
+                                    <select id="transfer-status" class="form-control" style="padding-left: 14px;" required>
+                                        <option value="Pending">รออนุมัติโอนย้าย (Pending)</option>
+                                        <option value="Approved">โอนย้ายสำเร็จทันที (Approved)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="transfer-notes">หมายเหตุและผู้สั่งการโอนย้าย</label>
+                                    <textarea id="transfer-notes" class="form-control" style="padding-left: 14px; height: 80px;" placeholder="ระบุรายละเอียดเพิ่มเติมเกี่ยวกับการโยกย้าย..." required></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">ล้างข้อมูล</button>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fa-solid fa-right-left"></i>
+                                    <span>บันทึกการโอนย้าย (Confirm Transfer)</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB E: ASSET DETAIL VIEW
+                     ----------------------------------------- -->
+                <div id="details-tab" class="tab-pane">
+                    <button class="btn-secondary" style="margin-bottom: 20px;" onclick="switchTab('assets')">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>กลับไปรายการอุปกรณ์</span>
+                    </button>
+                    
+                    <div class="detail-layout">
+                        <!-- Left Side: Basic specifications -->
+                        <div class="card-panel detail-card">
+                            <div class="asset-image-box">
+                                <i class="fa-solid fa-computer" id="detail-fallback-icon"></i>
+                                <!-- A dynamic icon is injected via JS corresponding to the category -->
+                            </div>
+                            
+                            <h3 id="detail-name" class="asset-spec-title">Desktop Computer Dell</h3>
+                            <div id="detail-id" class="asset-spec-id">AST-001</div>
+                            <span id="detail-status" class="badge active">พร้อมใช้งาน</span>
+                            
+                            <table class="spec-list">
+                                <tr>
+                                    <td>ประเภทอุปกรณ์:</td>
+                                    <td id="detail-category">Desktop Computer</td>
+                                </tr>
+                                <tr>
+                                    <td>สถานที่จัดเก็บ:</td>
+                                    <td id="detail-location">HQ-Floor 3</td>
+                                </tr>
+                                <tr>
+                                    <td>มูลค่าทรัพย์สิน:</td>
+                                    <td id="detail-value">35,000 THB</td>
+                                </tr>
+                                <tr>
+                                    <td>Serial Number:</td>
+                                    <td id="detail-serial">SN-DEL99485721</td>
+                                </tr>
+                                <tr>
+                                    <td>ผู้ดูแลรับผิดชอบ:</td>
+                                    <td id="detail-manager">IT Admin Team</td>
+                                </tr>
+                            </table>
+                            
+                            <!-- QR Code area -->
+                            <div class="qr-code-section">
+                                <div class="qr-code-placeholder">
+                                    <!-- A small mock QR code generated dynamically via SVG/Canvas -->
+                                    <canvas id="qr-canvas" width="70" height="70"></canvas>
+                                </div>
+                                <div class="qr-info">
+                                    <h5>แผ่นป้ายบาร์โค้ด QR Code</h5>
+                                    <p>ใช้สำหรับสแกนเพื่อตรวจสอบรายละเอียดทรัพย์สินผ่านแท็บเล็ตหรือโมบายล์แอปพลิเคชันนอกสถานที่</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side: Borrow and Transfer history timelines -->
+                        <div class="history-section">
+                            <!-- Borrow History -->
+                            <div class="card-panel">
+                                <div class="panel-header">
+                                    <h3 class="panel-title">
+                                        <i class="fa-solid fa-history"></i>
+                                        <span>ประวัติการยืม-คืนอุปกรณ์ (Borrowing History)</span>
+                                    </h3>
+                                </div>
+                                <div class="timeline" id="detail-borrow-timeline">
+                                    <!-- Populated dynamically by JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- Transfer History -->
+                            <div class="card-panel">
+                                <div class="panel-header">
+                                    <h3 class="panel-title">
+                                        <i class="fa-solid fa-route"></i>
+                                        <span>ประวัติการโอนย้ายสถานที่จัดเก็บ (Transfer Log)</span>
+                                    </h3>
+                                </div>
+                                <div class="timeline" id="detail-transfer-timeline">
+                                    <!-- Populated dynamically by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB H: SHIPPING / DELIVERY TRACKING
+                     ----------------------------------------- -->
+                <div id="shipping-tab" class="tab-pane">
+                    
+                    <!-- Stats Grid for Shipping -->
+                    <div class="stats-grid" style="margin-bottom: 24px;">
+                        <div class="stat-card total" style="border-left-color: var(--primary);">
+                            <div class="stat-info">
+                                <div class="stat-label">รายการจัดส่งทั้งหมด</div>
+                                <div id="stat-total-shipping" class="stat-value">3</div>
+                                <div class="stat-trend up">
+                                    <i class="fa-solid fa-truck"></i>
+                                    <span>อัปเดตเรียลไทม์</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-box"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card borrowed" style="border-left-color: var(--status-pending);">
+                            <div class="stat-info">
+                                <div class="stat-label">กำลังเตรียมการจัดส่ง</div>
+                                <div id="stat-preparing-shipping" class="stat-value">1</div>
+                                <div class="stat-trend info" style="color: var(--status-pending);">
+                                    <i class="fa-solid fa-boxes-packing"></i>
+                                    <span>รอดำเนินการ</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-warehouse"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card overdue" style="border-left-color: #3b82f6;">
+                            <div class="stat-info">
+                                <div class="stat-label">อยู่ระหว่างขนส่ง</div>
+                                <div id="stat-intransit-shipping" class="stat-value">1</div>
+                                <div class="stat-trend info" style="color: #3b82f6;">
+                                    <i class="fa-solid fa-truck-ramp-box"></i>
+                                    <span>กำลังนำส่ง</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-truck-fast"></i>
+                            </div>
+                        </div>
+
+                        <div class="stat-card value" style="border-left-color: var(--status-active);">
+                            <div class="stat-info">
+                                <div class="stat-label">จัดส่งสำเร็จแล้ว</div>
+                                <div id="stat-delivered-shipping" class="stat-value">1</div>
+                                <div class="stat-trend up" style="color: var(--status-active);">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>เรียบร้อย</span>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fa-solid fa-house-chimney-user"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 24px; align-items: start;">
+                        <!-- Left Side: Shipping Form -->
+                        <div class="card-panel form-card">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>สร้างใบจัดส่งอุปกรณ์ (New Delivery Ticket)</span>
+                                </h3>
+                            </div>
+                            <form id="shipping-form">
+                                <div class="form-grid" style="grid-template-columns: 1fr; gap: 14px;">
+                                    <div class="form-group">
+                                        <label for="shipping-asset-select">เลือกอุปกรณ์ที่ต้องการจัดส่ง</label>
+                                        <select id="shipping-asset-select" class="form-control" style="padding-left: 14px;" required>
+                                            <!-- Populated dynamically by JS -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipping-recipient">ชื่อผู้รับปลายทาง</label>
+                                        <input type="text" id="shipping-recipient" class="form-control" style="padding-left: 14px;" placeholder="ระบุชื่อผู้รับ..." required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipping-dest">สถานที่/สาขาปลายทาง</label>
+                                        <input type="text" id="shipping-dest" class="form-control" style="padding-left: 14px;" placeholder="ระบุสาขาหรือสถานที่จัดส่ง..." required>
+                                    </div>
+                                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label for="shipping-carrier">ผู้ให้บริการขนส่ง</label>
+                                            <select id="shipping-carrier" class="form-control" style="padding-left: 14px;" required>
+                                                <option value="Kerry Express">Kerry Express</option>
+                                                <option value="Flash Express">Flash Express</option>
+                                                <option value="DHL Express">DHL Express</option>
+                                                <option value="IT Messenger">IT Messenger (คนขับบริษัท)</option>
+                                                <option value="Thailand Post">ไปรษณีย์ไทย</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="shipping-tracking">เลขพัสดุ (Tracking No.)</label>
+                                            <input type="text" id="shipping-tracking" class="form-control" style="padding-left: 14px;" placeholder="เช่น KER-XXXX" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                        <div>
+                                            <label for="shipping-date">วันที่จัดส่ง</label>
+                                            <input type="date" id="shipping-date" class="form-control" style="padding-left: 14px;" required>
+                                        </div>
+                                        <div>
+                                            <label for="shipping-status">สถานะเริ่มต้น</label>
+                                            <select id="shipping-status" class="form-control" style="padding-left: 14px;" required>
+                                                <option value="Preparing">กำลังจัดเตรียมสินค้า (Preparing)</option>
+                                                <option value="In Transit">อยู่ระหว่างขนส่ง (In Transit)</option>
+                                                <option value="Delivered">จัดส่งสำเร็จ (Delivered)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions" style="margin-top: 16px;">
+                                    <button type="reset" class="btn-secondary">ล้างข้อมูล</button>
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fa-solid fa-truck"></i>
+                                        <span>บันทึกการจัดส่ง (Create Ticket)</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Right Side: Shipping Status List -->
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-list-check"></i>
+                                    <span>สถานะการขนส่งพัสดุทั้งหมด (Shipment Tracking List)</span>
+                                </h3>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>รหัสขนส่ง</th>
+                                            <th>ชื่ออุปกรณ์</th>
+                                            <th>ผู้รับ & ปลายทาง</th>
+                                            <th>บริษัทขนส่ง / เลขพัสดุ</th>
+                                            <th>สถานะ</th>
+                                            <th style="text-align: center;">การจัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shipping-list-body">
+                                        <!-- Rendered dynamically by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB F: REPORTS VIEW (MOCKED UP ANALYTICS)
+                     ----------------------------------------- -->
+                <div id="reports-tab" class="tab-pane">
+                    <div class="reports-grid">
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                    <span>สถานะความสมบูรณ์ของอุปกรณ์ (Equipment Health Condition)</span>
+                                </h3>
+                            </div>
+                            <div style="height: 250px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="healthChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card-panel">
+                            <div class="panel-header">
+                                <h3 class="panel-title">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                    <span>อัตราการใช้งานอุปกรณ์รายปี (Asset Utilization Rate)</span>
+                                </h3>
+                            </div>
+                            <div style="height: 250px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="utilizationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fa-solid fa-file-export"></i>
+                                <span>ดาวน์โหลดรายงานแบบสำเร็จรูป (Quick Export Reports)</span>
+                            </h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 10px;">
+                            <button class="btn-secondary" style="display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 10px; text-align: center;" onclick="alert('ระบบบันทึกรายงานดาวน์โหลดไฟล์ Excel สำเร็จ')">
+                                <i class="fa-solid fa-file-excel" style="font-size: 2rem; color: #10b981;"></i>
+                                <span>รายงานทรัพย์สินไอทีคงคลังทั้งหมด (xlsx)</span>
+                            </button>
+                            <button class="btn-secondary" style="display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 10px; text-align: center;" onclick="alert('ระบบบันทึกรายงานดาวน์โหลดไฟล์ PDF สำเร็จ')">
+                                <i class="fa-solid fa-file-pdf" style="font-size: 2rem; color: #ef4444;"></i>
+                                <span>รายงานการตรวจสอบทรัพย์สินประจำปี (pdf)</span>
+                            </button>
+                            <button class="btn-secondary" style="display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 10px; text-align: center;" onclick="alert('ระบบบันทึกรายงานดาวน์โหลดไฟล์ CSV สำเร็จ')">
+                                <i class="fa-solid fa-file-csv" style="font-size: 2rem; color: #3b82f6;"></i>
+                                <span>ประวัติผู้ขอยืมใช้เครื่องรายเดือน (csv)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -----------------------------------------
+                     TAB G: SYSTEM SETTINGS
+                     ----------------------------------------- -->
+                <div id="settings-tab" class="tab-pane">
+                    <div class="card-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">
+                                <i class="fa-solid fa-gears"></i>
+                                <span>การตั้งค่าและนโยบายระบบ (System & Policy Settings)</span>
+                            </h3>
+                        </div>
+                        
+                        <div class="settings-grid">
+                            <div class="settings-row">
+                                <div class="settings-info">
+                                    <h4>ระบบแจ้งเตือนทางอีเมลอัตโนมัติ (Email Alerting)</h4>
+                                    <p>ส่งข้อมูลใบเตือนถึงผู้ยืมอุปกรณ์ทางอีเมลเมื่อใกล้ถึงวันกำหนดส่งคืน 3 วัน</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="settings-row">
+                                <div class="settings-info">
+                                    <h4>อนุมัติรายการโอนย้ายอัตโนมัติ (Auto-Approve Transfers)</h4>
+                                    <p>โอนย้ายทรัพย์สินทันทีโดยไม่ต้องผ่านผู้ดูแลระบบ เมื่อเป็นอุปกรณ์ขนาดเล็กประเภทเมาส์ แป้นพิมพ์ หรืออุปกรณ์ต่อพ่วง</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="settings-row">
+                                <div class="settings-info">
+                                    <h4>การพิมพ์ฉลากบาร์โค้ด QR Code (Auto Barcode Generation)</h4>
+                                    <p>สร้างรูปภาพ QR Code พร้อมรหัสสินค้าทันทีที่คีย์เพิ่มทรัพย์สินใหม่เข้าระบบ</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="settings-row" style="border-bottom: none;">
+                                <div class="settings-info">
+                                    <h4>ระบบตรวจสอบสถานะเครื่องออนไลน์ (Network Ping Checker)</h4>
+                                    <p>ใช้ระเบียบวิธี ping อุปกรณ์ระบบเครือข่ายอัตโนมัติทุกๆ 10 นาที เพื่อบันทึกความพร้อมใช้งาน</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         3. ADD ASSET DIALOG MODAL (POPUP)
+         ========================================== -->
+    <div id="add-asset-modal" class="modal-overlay">
+        <div class="modal-content animate-fade">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-plus-circle" style="color: var(--primary); margin-right: 8px;"></i>เพิ่มทรัพย์สินใหม่เข้าระบบคลัง</h3>
+                <button id="modal-close" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="add-asset-form">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-id">รหัสทรัพย์สิน (Asset ID)</label>
+                            <input type="text" id="new-asset-id" class="form-control" style="padding-left: 14px;" placeholder="ตัวอย่าง: AST-007" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-name">ชื่ออุปกรณ์ (Asset Name)</label>
+                            <input type="text" id="new-asset-name" class="form-control" style="padding-left: 14px;" placeholder="ระบุยี่ห้อและรุ่นของอุปกรณ์..." required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-category">หมวดหมู่ (Category)</label>
+                            <select id="new-asset-category" class="form-control" style="padding-left: 14px;" required>
+                                <option value="">เลือกหมวดหมู่...</option>
+                                <option value="Desktop Computer">Desktop Computer (คอมพิวเตอร์ตั้งโต๊ะ)</option>
+                                <option value="Notebook">Notebook (คอมพิวเตอร์แล็ปท็อป)</option>
+                                <option value="Printer">Printer (เครื่องพิมพ์)</option>
+                                <option value="Monitor">Monitor (หน้าจอมอนิเตอร์)</option>
+                                <option value="Router">Router (เราเตอร์ระบบเครือข่าย)</option>
+                                <option value="Switch">Switch (สวิตช์ระบบเครือข่าย)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-location">สถานที่จัดเก็บแรกรับ</label>
+                            <select id="new-asset-location" class="form-control" style="padding-left: 14px;" required>
+                                <option value="">เลือกสถานที่...</option>
+                                <option value="HQ-Floor 1">สำนักงานใหญ่ ชั้น 1 (HQ-Floor 1)</option>
+                                <option value="HQ-Floor 2">สำนักงานใหญ่ ชั้น 2 (HQ-Floor 2)</option>
+                                <option value="HQ-Floor 3">สำนักงานใหญ่ ชั้น 3 (HQ-Floor 3)</option>
+                                <option value="Finance Room">ห้องฝ่ายการเงิน (Finance Room)</option>
+                                <option value="Server Room A">ห้องเซิร์ฟเวอร์ A (Server Room A)</option>
+                                <option value="Server Room B">ห้องเซิร์ฟเวอร์ B (Server Room B)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-value">มูลค่าประเมิน (บาท)</label>
+                            <input type="number" id="new-asset-value" class="form-control" style="padding-left: 14px;" placeholder="ระบุมูลค่าอุปกรณ์..." required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label for="new-asset-serial">Serial Number</label>
+                            <input type="text" id="new-asset-serial" class="form-control" style="padding-left: 14px;" placeholder="ระบุหมายเลขเครื่อง (SN)..." required>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 16px;">
+                        <button type="button" id="modal-cancel" class="btn-secondary">ยกเลิก</button>
+                        <button type="submit" class="btn-primary">บันทึกเครื่องใหม่</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
